@@ -16,22 +16,23 @@ int main()
 	Vertex verticies[] = {
 		Vertex(glm::vec3(-0.5, -0.5 ,0), glm::vec2(0,0)),
 		Vertex(glm::vec3(0,0.5,0), glm::vec2(.5f,1.0f)),
-		Vertex(glm::vec3(0.5,-0.5,0), glm::vec2(1.0f,0))
+		Vertex(glm::vec3(0.5,-0.5,0), glm::vec2(1.0f,0)),
+		Vertex(glm::vec3(0.0,-1.0,0), glm::vec2(1.0f,0))
 	};
 
 
-	Vertex verticies2[] = {
-		Vertex(glm::vec3(-.5, -.5 ,0), glm::vec2(0,0)),
-		Vertex(glm::vec3(.5f,-.5f,0), glm::vec2(1.0f,0)),
-		Vertex(glm::vec3(0,-1.0,0), glm::vec2(.5f,1.0f))
-	};
 
-	Mesh mesh(verticies, sizeof(verticies) / sizeof(verticies[0]));
-	Mesh mesh2(verticies2, sizeof(verticies2) / sizeof(verticies2[0]));
+	unsigned int indicies[] = { 0,1,2 };
+	unsigned int indicies2[] = { 0,2,3 };
+
+	//Mesh mesh(verticies, sizeof(verticies) / sizeof(verticies[0]), indicies, sizeof(indicies) / sizeof(indicies[0]));
+	//Mesh mesh2(verticies, sizeof(verticies) / sizeof(verticies[0]), indicies2, sizeof(indicies2) / sizeof(indicies2[0]));
+
+	Mesh mesh("./res/test.obj");
 
 	Shader shader("./res/basicShader");
 	Texture texture("./res/bricks.jpg");
-	Camera camera(glm::vec3(0, 0, -3), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), 0.01f, 1000.0f);
+	Camera camera(glm::vec3(0, 0, -13), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), 0.01f, 1000.0f);
 	Transform transform;
 
 	float counter = 0.0f;
@@ -47,7 +48,7 @@ int main()
 		texture.Bind(0);
 		shader.Update(transform, camera);
 		mesh.Draw();
-		mesh2.Draw();
+		//mesh2.Draw();
 
 
 		display.Update();
