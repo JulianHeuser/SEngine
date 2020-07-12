@@ -31,6 +31,9 @@ Display::Display(int width, int height, const std::string& title)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+
+	SDL_GetCurrentDisplayMode(0, &m_displayMode);
 }
 
 Display::~Display()
@@ -46,7 +49,12 @@ void Display::Clear(float r, float g, float b, float a)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool Display::IsClosed()
+void Display::changeDisplayRes(int x, int y)
+{
+	SDL_SetWindowSize(m_window, x, y);
+}
+
+bool& Display::IsClosed()
 {
 	return m_isClosed;
 }
@@ -55,13 +63,4 @@ void Display::Update()
 {
 	SDL_GL_SwapWindow(m_window);
 
-	SDL_Event e;
-
-	while (SDL_PollEvent(&e))
-	{
-		if (e.type == SDL_QUIT) 
-		{
-			m_isClosed = true;
-		}
-	}
 }

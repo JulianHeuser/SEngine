@@ -11,11 +11,13 @@ public:
 
 	void Update();
 	void Clear(float r, float g, float b, float a);
+	void changeDisplayRes(int x, int y);
 
-	bool IsClosed();
+	bool& IsClosed();
 
 	inline unsigned int GetWidth() { return m_width; };
 	inline unsigned int GetHeight() { return m_height; };
+	inline SDL_DisplayMode GetDisplayMode() { return m_displayMode; };
 
 protected:
 
@@ -30,5 +32,7 @@ private:
 	SDL_Window* m_window;
 
 	SDL_GLContext m_glContext;
+
+	SDL_DisplayMode m_displayMode;
 };
 

@@ -1,9 +1,19 @@
 #include "Mesh.h"
 #include <vector>
 
-Mesh::Mesh(const std::string fileName)
+Mesh::Mesh(const std::string fileName, glm::vec3 pos)
 {
 	IndexedModel model = OBJModel(fileName).ToIndexedModel();
+
+	m_pos = pos;
+
+	for (unsigned int i = 0; i < model.positions.size(); i++)
+	{
+		model.positions[i].x += pos.x;
+		model.positions[i].y += pos.y;
+		model.positions[i].z += pos.z;
+	}
+
 	InitMesh(model);
 }
 

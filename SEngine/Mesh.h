@@ -29,12 +29,11 @@ class Mesh
 {
 public:
 	Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indicies, unsigned int numIndicies);
-
-	Mesh(const std::string fileName);
+	Mesh(const std::string fileName, glm::vec3 pos = glm::vec3(0,0,0));
+	virtual ~Mesh();
 
 	void Draw();
-
-	virtual ~Mesh();
+	inline glm::vec3 GetPos() { return m_pos; };
 
 private:
 
@@ -53,6 +52,8 @@ private:
 	GLuint m_vertexArrayObject;
 	GLuint m_vertexArrayBuffers[NUM_BUFFERS];
 	unsigned int m_drawCount;
+
+	glm::vec3 m_pos;
 
 };
 

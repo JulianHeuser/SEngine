@@ -28,6 +28,9 @@
     <ClCompile Include="obj_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="display.h">
@@ -52,6 +55,9 @@
       <Filter>Source Files\headers</Filter>
     </ClInclude>
     <ClInclude Include="obj_loader.h">
+      <Filter>Source Files\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
       <Filter>Source Files\headers</Filter>
     </ClInclude>
   </ItemGroup>
