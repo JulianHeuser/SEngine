@@ -2,6 +2,12 @@
 #include <glm/glm.hpp>
 #include "Camera.h"
 
+/*
+The Player
+
+The player has a position, angle, and a camera.
+*/
+
 class Player
 {
 public:
@@ -12,6 +18,7 @@ public:
 	void UpdateRot();
 
 	float m_forward_angle = 0;
+	float m_up_angle = 0;
 
 	Camera m_cam;
 private:

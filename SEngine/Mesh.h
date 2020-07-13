@@ -28,6 +28,7 @@ private:
 class Mesh
 {
 public:
+	Mesh() {};
 	Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indicies, unsigned int numIndicies);
 	Mesh(const std::string fileName, glm::vec3 pos = glm::vec3(0,0,0));
 	virtual ~Mesh();
@@ -42,8 +43,8 @@ private:
 	enum
 	{
 		POSITION_VB,
-		TEXCOORD_VB,
 		NORMAL_VB,
+		TEXCOORD_VB,
 		INDEX_VB,
 
 		NUM_BUFFERS

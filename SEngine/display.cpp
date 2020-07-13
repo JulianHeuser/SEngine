@@ -32,7 +32,7 @@ Display::Display(int width, int height, const std::string& title)
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 	SDL_GetCurrentDisplayMode(0, &m_displayMode);
 }
 

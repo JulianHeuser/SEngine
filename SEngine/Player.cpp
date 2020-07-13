@@ -5,7 +5,7 @@ Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio)
 {
 	m_pos = spawnPos;
 	m_vel = glm::vec3(0, 0, 0);
-	m_cam = Camera(spawnPos, fov, aspectRatio, 0.01f, 10000.0f);
+	m_cam = Camera(spawnPos, fov, aspectRatio, 0.1f, 2000.0f);
 }
 
 void Player::Move()
@@ -23,7 +23,5 @@ void Player::Move(glm::vec3 moveAmount)
 
 void Player::UpdateRot()
 {
-
-	std::cout << m_forward_angle << std::endl;
-	m_cam.ChangeRot(glm::vec3(cos(m_forward_angle), 0, sin(m_forward_angle)));
+	m_cam.ChangeRot(glm::vec3(cos(m_forward_angle), m_up_angle, sin(m_forward_angle)));
 }

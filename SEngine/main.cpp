@@ -6,10 +6,11 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Player.h"
+#include "Scene.h"
 #include <GL/glew.h>
 #include <chrono>
 #include <random>
-
+#include <memory>
 
 enum class GameState
 {
@@ -18,24 +19,25 @@ enum class GameState
 	DEAD
 };
 
-#define DISPLAY_WIDTH 800
-#define DISPLAY_HEIGHT 600
-
+#define DISPLAY_WIDTH 1280
+#define DISPLAY_HEIGHT 720
 
 int main()
 {
 	Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, "Hello World");
 
 	Shader shader("./res/basicShader");
-	Texture texture("./res/bricks.jpg");
 	Transform transform;
 
 	float frameTime = 0;
 
-	Mesh mesh("./res/building.obj", glm::vec3(0,0,200));
+	Mesh meshList[] = { Mesh("./res/models/building.obj", glm::vec3(0,0,0)) , Mesh("./res/models/building.obj", glm::vec3(-200,0,50)) };
+	Scene testScene(meshList, 2);
 
-	Player player(glm::vec3(0, 0, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight());
+	Player player(glm::vec3(0, 0, -50), 70.0f, (float)display.GetWidth() / (float)display.GetHeight());
 	glm::vec3 dir = glm::vec3(0, 0, 0);
+
+	const float lookSensitivity = 5.0f;
 
 	while (!display.IsClosed())
 	{
@@ -65,14 +67,15 @@ int main()
 					dir.x = 1;
 					break;
 
-
-				case SDLK_RIGHT:
-					player.m_forward_angle += frameTime * 50;
-					break;
-				case SDLK_LEFT:
-					player.m_forward_angle -= frameTime * 50;
+				case SDLK_ESCAPE:
+					display.IsClosed() = true;
 					break;
 				}
+				break;
+
+			case SDL_MOUSEMOTION:
+				player.m_forward_angle += e.motion.xrel * lookSensitivity * frameTime;
+				player.m_up_angle -= e.motion.yrel * lookSensitivity * frameTime;
 				break;
 			case SDL_KEYUP:
 				switch (e.key.keysym.sym)
@@ -106,9 +109,13 @@ int main()
 		display.Clear(0.0f, 0.5f, 0.5f, 1.0f);
 
 		shader.Bind();
-		texture.Bind(0);
 		shader.Update(transform, player.m_cam);
-		mesh.Draw();
+		//mesh.Draw();
+
+
+		testScene.Draw();
+
+
 
 		display.Update();
 		auto frameTimeEnd = std::chrono::high_resolution_clock::now();
