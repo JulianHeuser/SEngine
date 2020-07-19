@@ -31,8 +31,8 @@ int main()
 
 	float frameTime = 0;
 
-	Mesh meshList[] = { Mesh("./res/models/building.obj", glm::vec3(0,0,0)) , Mesh("./res/models/building.obj", glm::vec3(-200,0,50)) };
-	Scene testScene(meshList, 2);
+	Mesh meshList[] = { Mesh("./res/models/building.obj", glm::vec3(-500,0,0)), Mesh("./res/models/flat_floor.obj", glm::vec3(0,-20,0)),Mesh("./res/models/flat_floor.obj", glm::vec3(50,-40,0)) };
+	Scene testScene(meshList, 3);
 
 	Player player(glm::vec3(0, 0, -50), 70.0f, (float)display.GetWidth() / (float)display.GetHeight());
 	glm::vec3 dir = glm::vec3(0, 0, 0);
@@ -102,7 +102,8 @@ int main()
 		
 		//Player code
 		player.Move(dir * (frameTime * 50));
-		player.UpdateRot();
+		player.Update();
+		player.DetectCollision(testScene);
 
 
 		//Rendering
@@ -112,7 +113,7 @@ int main()
 		shader.Update(transform, player.m_cam);
 		//mesh.Draw();
 
-
+		//Render scene
 		testScene.Draw();
 
 

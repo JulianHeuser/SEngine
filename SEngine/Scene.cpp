@@ -13,6 +13,7 @@ Scene::Scene(Mesh sceneMeshes[], unsigned int size)
 	{
 		m_meshes[i] = sceneMeshes[i];
 	}
+
 }
 
 

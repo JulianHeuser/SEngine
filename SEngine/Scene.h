@@ -16,6 +16,9 @@ public:
 	Scene(Mesh sceneMeshes[], unsigned int size);
 	void Draw();
 
+	inline unsigned int GetMeshNum() { return m_meshNum; };
+	std::unique_ptr<Mesh[]>& GetMeshes() { return m_meshes; };
+
 private:
 	std::unique_ptr<Mesh[]> m_meshes;
 	unsigned int m_meshNum;
