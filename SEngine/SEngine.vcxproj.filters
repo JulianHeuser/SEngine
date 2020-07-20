@@ -34,6 +34,9 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Physics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="display.h">
@@ -64,6 +67,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

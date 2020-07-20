@@ -1,27 +1,36 @@
 #include "Player.h"
 #include <glm/glm.hpp>
+#include "Physics.h"
 
 
-
-Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio)
+Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics)
 {
 	m_pos = spawnPos;
 	m_vel = glm::vec3(0, 0, 0);
 	m_cam = Camera(spawnPos, fov, aspectRatio, 0.1f, 2000.0f);
 
+	//Physics
+	m_worldID = physics.GetWorld();
+	m_bodyID = dBodyCreate(m_worldID);
+	m_geomID = dCreateBox(physics.GetSpace(), 1, 1, 1);
+
+	dGeomSetBody(m_geomID, m_bodyID);
+
+	dBodySetPosition(m_bodyID, spawnPos.x, spawnPos.y, spawnPos.z);
 	//btBoxShape* groundShape = new btBoxShape(btVector3(1,1,1)); //m_rigidBody->createBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
 }
 
-void Player::Move()
-{
-	m_pos += m_vel;
-	m_cam.ChangePos(m_pos);
-}
 
 void Player::Move(glm::vec3 moveAmount)
 {
-	m_pos.z += moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle);
-	m_pos.x += moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle);
+
+	float xComp = (moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle)) * 10;
+	float zComp = (moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle)) * 10;
+
+	dBodyAddForce(m_bodyID, xComp, 0, zComp);
+	//m_pos.z += moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle);
+	//m_pos.x += moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle);
+	UpdatePos();
 	m_cam.ChangePos(m_pos);
 }
 
@@ -30,18 +39,9 @@ void Player::Update()
 	UpdateRot();
 }
 
-void Player::DetectCollision(Scene& scene)
+void Player::UpdatePos()
 {
-	const glm::vec3 sphereOrigin = m_pos;
-	const float sphereRadius = 3.0f;
-	const float sphereRadiusSquared = sphereRadius*sphereRadius;
-
-	std::unique_ptr<Mesh[]>& meshes = scene.GetMeshes();
-
-	for (unsigned int i = 0; i < scene.GetMeshNum(); i++)
-	{
-		//meshes[i].model.
-	}
+	m_pos = glm::vec3(dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1], dBodyGetPosition(m_bodyID)[2]);
 }
 
 void Player::UpdateRot()

@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 #include <string>
 #include "obj_loader.h"
+#include <ode/ode.h>
+#include "Physics.h"
 
 class Vertex
 {
@@ -29,8 +31,8 @@ class Mesh
 {
 public:
 	Mesh() {};
-	Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indicies, unsigned int numIndicies);
-	Mesh(const std::string fileName, glm::vec3 pos = glm::vec3(0,0,0));
+	Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indicies, unsigned int numIndicies, Physics physics);
+	Mesh(const std::string fileName, Physics physics, glm::vec3 pos = glm::vec3(0, 0, 0));
 	virtual ~Mesh();
 
 	void Draw();
@@ -56,5 +58,9 @@ private:
 
 	glm::vec3 m_pos;
 
+
+	dWorldID m_worldID;
+	dBodyID m_bodyID;
+	dGeomID m_geomID;
 };
 

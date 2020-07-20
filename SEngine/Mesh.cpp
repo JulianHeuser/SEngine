@@ -1,7 +1,7 @@
 #include "Mesh.h"
 #include <vector>
 
-Mesh::Mesh(const std::string fileName, glm::vec3 pos)
+Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 {
 	IndexedModel model = OBJModel(fileName).ToIndexedModel();
 
@@ -15,9 +15,18 @@ Mesh::Mesh(const std::string fileName, glm::vec3 pos)
 	}
 
 	InitMesh(model);
+
+	//Physics
+	m_worldID = physics.GetWorld();
+	m_bodyID = dBodyCreate(m_worldID);
+	dBodySetKinematic(m_bodyID);
+
+	m_geomID = dCreateBox(physics.GetSpace(), 5, 1, 5);
+
+	dGeomSetBody(m_geomID, m_bodyID);
 }
 
-Mesh::Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indices, unsigned int numIndicies)
+Mesh::Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indices, unsigned int numIndicies, Physics physics)
 {
 
 	IndexedModel model;
