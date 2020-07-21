@@ -12,7 +12,7 @@ Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics
 	//Physics
 	m_worldID = physics.GetWorld();
 	m_bodyID = dBodyCreate(m_worldID);
-	m_geomID = dCreateBox(physics.GetSpace(), 1, 1, 1);
+	m_geomID = dCreateSphere(physics.GetSpace(), 1);
 
 	dGeomSetBody(m_geomID, m_bodyID);
 
@@ -20,12 +20,12 @@ Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics
 	//btBoxShape* groundShape = new btBoxShape(btVector3(1,1,1)); //m_rigidBody->createBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
 }
 
-
+#define MOVE_SPEED 50
 void Player::Move(glm::vec3 moveAmount)
 {
 
-	float xComp = (moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle)) * 10;
-	float zComp = (moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle)) * 10;
+	float xComp = (moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle)) * MOVE_SPEED;
+	float zComp = (moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle)) * MOVE_SPEED;
 
 	dBodyAddForce(m_bodyID, xComp, 0, zComp);
 	//m_pos.z += moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle);

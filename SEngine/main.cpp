@@ -132,8 +132,8 @@ int main()
 	//Initialize physics
 	dWorldSetGravity(physics.GetWorld(), 0, -3, 0);
 
-	Mesh meshList[] = { Mesh("./res/models/building.obj", physics, glm::vec3(-500,0,0)), Mesh("./res/models/flat_floor.obj", physics, glm::vec3(0,-20,0)),Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,-40,0)) };
-	Scene testScene(meshList, 3);
+	Mesh meshList[] = {Mesh("./res/models/flat_floor.obj", physics, glm::vec3(0,-20,0))};
+	Scene testScene(meshList, 1);
 
 	Player player(glm::vec3(0, 50, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
 	glm::vec3 dir = glm::vec3(0, 0, 0);
@@ -151,10 +151,10 @@ int main()
 		elapsedTime += frameTime;
 		if (elapsedTime > .01)
 		{
-			dWorldQuickStep(physics.GetWorld() , elapsedTime);
+			dWorldQuickStep(physics.GetWorld(), elapsedTime);
+			dJointGroupEmpty(physics.GetContacts());
 			elapsedTime = 0;
 		}
-		dJointGroupEmpty(physics.GetContacts());
 
 
 		//Input

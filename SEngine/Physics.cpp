@@ -4,7 +4,8 @@ Physics::Physics()
 {
 	dInitODE2(dInitFlagManualThreadCleanup);
 	dAllocateODEDataForThread((unsigned int)dAllocateMaskAll);
-
+	dSetDebugHandler(0);
+	dSetErrorHandler(0);
 	
 	world = dWorldCreate();
 	space = dSimpleSpaceCreate(0);

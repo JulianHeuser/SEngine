@@ -5,7 +5,6 @@ Scene::Scene(Mesh sceneMeshes[], unsigned int size)
 {
 	m_meshNum = size;
 
-	std::cout << m_meshNum << std::endl;
 
 	m_meshes = std::make_unique<Mesh[]>(m_meshNum);
 

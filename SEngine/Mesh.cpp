@@ -1,6 +1,8 @@
 #include "Mesh.h"
 #include <vector>
 
+#include <iostream>
+
 Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 {
 	IndexedModel model = OBJModel(fileName).ToIndexedModel();
@@ -21,9 +23,28 @@ Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 	m_bodyID = dBodyCreate(m_worldID);
 	dBodySetKinematic(m_bodyID);
 
-	m_geomID = dCreateBox(physics.GetSpace(), 5, 1, 5);
+	//m_geomID = dCreateBox(physics.GetSpace(), 1000, 1, 1000);
 
+	//create collider
+	//dGeomTriMeshDataBuildDouble(triMeshID, triVert, 3*sizeof(dReal), 4, indexes, 6, 3*sizeof(unsigned int));
+	//dGeomTriMeshDataBuildDouble(triMeshID, &m_modelInfo.positions[0], sizeof(glm::vec3), m_modelInfo.positions.size(), &m_modelInfo.indices[0], m_modelInfo.indices.size(), 1);
+	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
+
+	for (unsigned int i = 0; i < model.positions.size(); i++)
+	{
+		triVert[i][0] = model.positions[i].x;
+		triVert[i][1] = model.positions[i].y;
+		triVert[i][2] = model.positions[i].z;
+	}
+	for (unsigned int i = 0; i < model.indices.size(); i++)
+	{
+		indexes[i] = model.indices[i];
+	}
+
+	dGeomTriMeshDataBuildSimple(triMeshID, *triVert, model.positions.size(), indexes, model.indices.size());
+	m_geomID = dCreateTriMesh(physics.GetSpace(), triMeshID, NULL, NULL, NULL);
 	dGeomSetBody(m_geomID, m_bodyID);
+	std::cout << dGeomTriMeshGetTriangleCount(m_geomID) <<std::endl;
 }
 
 Mesh::Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indices, unsigned int numIndicies, Physics physics)

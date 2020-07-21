@@ -26,6 +26,8 @@ private:
 	glm::vec3 normal;
 };
 
+#define MAX_COL_VERICIES 100
+#define MAX_COL_INDICES 200
 
 class Mesh
 {
@@ -62,5 +64,10 @@ private:
 	dWorldID m_worldID;
 	dBodyID m_bodyID;
 	dGeomID m_geomID;
+
+
+
+	dTriIndex indexes[MAX_COL_INDICES];
+	dVector3 triVert[MAX_COL_VERICIES];
 };
 
