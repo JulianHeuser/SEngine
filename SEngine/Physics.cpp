@@ -4,17 +4,16 @@ Physics::Physics()
 {
 	dInitODE2(dInitFlagManualThreadCleanup);
 	dAllocateODEDataForThread((unsigned int)dAllocateMaskAll);
-	dSetDebugHandler(0);
-	dSetErrorHandler(0);
 	
+
 	world = dWorldCreate();
 	space = dSimpleSpaceCreate(0);
 	contactGroup = dJointGroupCreate(0);
 
 
-	//dWorldSetERP(world, 0.2);
-	//dWorldSetCFM(world, 1e-5);
-
-	dWorldSetContactMaxCorrectingVel(world, 0.9);
-	dWorldSetContactSurfaceLayer(world, 0.001);
+	dWorldSetERP(world, 0.2);
+	dWorldSetCFM(world, 1e-5);
+	
+	//dWorldSetContactMaxCorrectingVel(world, 0.9);
+	//dWorldSetContactSurfaceLayer(world, 0.001);
 }

@@ -16,6 +16,9 @@ Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics
 
 	dGeomSetBody(m_geomID, m_bodyID);
 
+	dMassSetSphere(&m_mass, .5, 1);
+	dBodySetMass(m_bodyID, &m_mass);
+
 	dBodySetPosition(m_bodyID, spawnPos.x, spawnPos.y, spawnPos.z);
 	//btBoxShape* groundShape = new btBoxShape(btVector3(1,1,1)); //m_rigidBody->createBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
 }
@@ -27,9 +30,9 @@ void Player::Move(glm::vec3 moveAmount)
 	float xComp = (moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle)) * MOVE_SPEED;
 	float zComp = (moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle)) * MOVE_SPEED;
 
+	//dBodySetLinearVel(m_bodyID, xComp, dBodyGetLinearVel(m_bodyID)[1], zComp);
 	dBodyAddForce(m_bodyID, xComp, 0, zComp);
-	//m_pos.z += moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle);
-	//m_pos.x += moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle);
+
 	UpdatePos();
 	m_cam.ChangePos(m_pos);
 }

@@ -13,7 +13,7 @@
 #include <memory>
 #include "Physics.h"
 
-#define MAX_CONTACTS 15
+#define MAX_CONTACTS 50
 
 Physics physics;
 
@@ -52,17 +52,19 @@ static void nearCallback(void* data, dGeomID o1, dGeomID o2)
 
 	{
 
-		contact[i].surface.mode = dContactBounce | dContactSoftCFM;
+		//contact[i].surface.mode = dContactBounce | dContactSlip1;
+
+		contact[i].surface.mode = dContactMu2;
 
 		contact[i].surface.mu = dInfinity;
 
 		contact[i].surface.mu2 = 0;
 
-		contact[i].surface.bounce = 0.01;
+		//contact[i].surface.bounce = 0.01;
 
-		contact[i].surface.bounce_vel = 0.1;
+		//contact[i].surface.bounce_vel = 0.1;
 
-		contact[i].surface.soft_cfm = 0.01;
+		//contact[i].surface.soft_cfm = 0.01;
 
 	}
 
@@ -126,13 +128,13 @@ int main()
 
 
 
-	float frameTime = 0;
-	float elapsedTime = 0;
+	double frameTime = 0;
+	double elapsedTime = 0;
 
 	//Initialize physics
 	dWorldSetGravity(physics.GetWorld(), 0, -3, 0);
 
-	Mesh meshList[] = {Mesh("./res/models/flat_floor.obj", physics, glm::vec3(0,-20,0))};
+	Mesh meshList[] = {Mesh("./res/models/plane.obj", physics, glm::vec3(0,0,0))}; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
 	Scene testScene(meshList, 1);
 
 	Player player(glm::vec3(0, 50, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
@@ -147,11 +149,11 @@ int main()
 		auto frameTimeStart = std::chrono::high_resolution_clock::now();
 
 		//Physics step
-		dSpaceCollide(physics.GetSpace(), 0, &nearCallback);
 		elapsedTime += frameTime;
 		if (elapsedTime > .01)
 		{
-			dWorldQuickStep(physics.GetWorld(), elapsedTime);
+			dSpaceCollide(physics.GetSpace(), 0, &nearCallback);
+			dWorldStep(physics.GetWorld(), .01);
 			dJointGroupEmpty(physics.GetContacts());
 			elapsedTime = 0;
 		}
@@ -187,8 +189,8 @@ int main()
 				break;
 
 			case SDL_MOUSEMOTION:
-				player.m_forward_angle += e.motion.xrel * lookSensitivity * frameTime;
-				player.m_up_angle -= e.motion.yrel * lookSensitivity * frameTime;
+				player.m_forward_angle += e.motion.xrel * lookSensitivity * float(frameTime);
+				player.m_up_angle -= e.motion.yrel * lookSensitivity * float(frameTime);
 				break;
 			case SDL_KEYUP:
 				switch (e.key.keysym.sym)
@@ -214,7 +216,7 @@ int main()
 		}
 		
 		//Player code
-		player.Move(dir * (frameTime * 50));
+		player.Move(dir * (float(frameTime) * 50.0f));
 		player.Update();
 
 

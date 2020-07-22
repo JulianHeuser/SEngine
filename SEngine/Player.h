@@ -31,6 +31,7 @@ private:
 	dWorldID m_worldID;
 	dBodyID m_bodyID;
 	dGeomID m_geomID;
+	dMass m_mass;
 
 	glm::vec3 m_pos;
 	glm::vec3 m_vel;
