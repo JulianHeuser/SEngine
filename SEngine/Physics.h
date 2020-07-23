@@ -13,7 +13,9 @@ public:
 
 private:
 	dWorldID world;
-	dSpaceID space;
 	dJointGroupID contactGroup;
+
+	//Collision spaces
+	dSpaceID space; //Primary space for all physics collisions
 };
 

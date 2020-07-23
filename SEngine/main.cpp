@@ -52,17 +52,16 @@ static void nearCallback(void* data, dGeomID o1, dGeomID o2)
 
 	{
 
-		//contact[i].surface.mode = dContactBounce | dContactSlip1;
+		contact[i].surface.mode = dContactBounce | dContactSlip1;
+		
+		contact[i].surface.mu = 5;
 
-		contact[i].surface.mode = dContactMu2;
 
-		contact[i].surface.mu = dInfinity;
+		contact[i].surface.bounce = 0.01;
 
-		contact[i].surface.mu2 = 0;
+		contact[i].surface.bounce_vel = 0.1;
 
-		//contact[i].surface.bounce = 0.01;
-
-		//contact[i].surface.bounce_vel = 0.1;
+		contact[i].surface.slip1 = .1;
 
 		//contact[i].surface.soft_cfm = 0.01;
 
@@ -132,13 +131,14 @@ int main()
 	double elapsedTime = 0;
 
 	//Initialize physics
-	dWorldSetGravity(physics.GetWorld(), 0, -3, 0);
+	dWorldSetGravity(physics.GetWorld(), 0, -5, 0);
 
-	Mesh meshList[] = {Mesh("./res/models/plane.obj", physics, glm::vec3(0,0,0))}; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
+	Mesh meshList[] = {Mesh("./res/models/testLevel.obj", physics, glm::vec3(0,0,0))}; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
 	Scene testScene(meshList, 1);
 
 	Player player(glm::vec3(0, 50, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
 	glm::vec3 dir = glm::vec3(0, 0, 0);
+	bool holdingJump = false;
 
 	const float lookSensitivity = 5.0f;
 
@@ -153,7 +153,7 @@ int main()
 		if (elapsedTime > .01)
 		{
 			dSpaceCollide(physics.GetSpace(), 0, &nearCallback);
-			dWorldStep(physics.GetWorld(), .01);
+			dWorldQuickStep(physics.GetWorld(), .01);
 			dJointGroupEmpty(physics.GetContacts());
 			elapsedTime = 0;
 		}
@@ -181,7 +181,9 @@ int main()
 				case SDLK_d:
 					dir.x = 1;
 					break;
-
+				case SDLK_SPACE:
+					holdingJump = true;
+					break;
 				case SDLK_ESCAPE:
 					display.IsClosed() = true;
 					break;
@@ -203,6 +205,9 @@ int main()
 				case SDLK_d:
 					dir.x = 0;
 					break;
+				case SDLK_SPACE:
+					holdingJump = false;
+					break;
 				}
 				break;
 
@@ -218,7 +223,8 @@ int main()
 		//Player code
 		player.Move(dir * (float(frameTime) * 50.0f));
 		player.Update();
-
+		if (holdingJump)
+			player.Jump();
 
 		//Rendering
 		display.Clear(0.0f, 0.5f, 0.5f, 1.0f);

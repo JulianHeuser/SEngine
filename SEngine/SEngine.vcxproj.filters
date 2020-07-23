@@ -8,6 +8,9 @@
     <Filter Include="headers">
       <UniqueIdentifier>{e6776fdb-59b1-435e-a697-6d6e4c7b2471}</UniqueIdentifier>
     </Filter>
+    <Filter Include="headers\Utilities">
+      <UniqueIdentifier>{119ad704-9eb8-42f2-8838-ffc15ca7505c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="Physics.h">
       <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Raycast.h">
+      <Filter>headers\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

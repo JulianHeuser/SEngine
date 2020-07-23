@@ -26,8 +26,8 @@ private:
 	glm::vec3 normal;
 };
 
-#define MAX_COL_VERICIES 100
-#define MAX_COL_INDICES 200
+#define MAX_COL_VERICIES 1000
+#define MAX_COL_INDICES 2000
 
 class Mesh
 {

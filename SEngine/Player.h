@@ -19,6 +19,8 @@ public:
 	void Move(glm::vec3 moveAmount);
 	void Update();
 
+	void Jump();
+
 	float m_forward_angle = 0;
 	float m_up_angle = 0;
 
@@ -26,9 +28,11 @@ public:
 private:
 	void UpdateRot();
 	void UpdatePos();
+	void CheckGround();
 
 	//CommonRigidBodyBase* m_rigidBody;
 	dWorldID m_worldID;
+	dSpaceID m_spaceID;
 	dBodyID m_bodyID;
 	dGeomID m_geomID;
 	dMass m_mass;
@@ -36,5 +40,7 @@ private:
 	glm::vec3 m_pos;
 	glm::vec3 m_vel;
 
+	bool grounded = false;
+	bool canJump = false;
 };
 

@@ -14,6 +14,6 @@ Physics::Physics()
 	dWorldSetERP(world, 0.2);
 	dWorldSetCFM(world, 1e-5);
 	
-	//dWorldSetContactMaxCorrectingVel(world, 0.9);
-	//dWorldSetContactSurfaceLayer(world, 0.001);
+	dWorldSetContactMaxCorrectingVel(world, 0.9);
+	dWorldSetContactSurfaceLayer(world, 0.001);
 }
