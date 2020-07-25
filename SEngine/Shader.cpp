@@ -24,6 +24,8 @@ Shader::Shader(const std::string& fileName)
     CheckShaderError(m_program, GL_VALIDATE_STATUS, true, "Error: Program is invalid: ");
 
     m_uniforms[TRANSFORM_U] = glGetUniformLocation(m_program, "transform");
+    m_uniforms[COLOR1_U] = glGetUniformLocation(m_program, "color1");
+    m_uniforms[COLOR2_U] = glGetUniformLocation(m_program, "color2");
 }
 
 Shader::~Shader()
@@ -93,6 +95,8 @@ void Shader::Update(const Transform& transform, const Camera& camera)
     glm::mat4 model = camera.GetViewProjection() * transform.GetModel();
 
     glUniformMatrix4fv(m_uniforms[TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
+    glUniform3f(m_uniforms[COLOR1_U], 1,.8f,.243f);
+    glUniform3f(m_uniforms[COLOR2_U], 1, .498f, .243f);
 }
 
 void Shader::CheckShaderError(GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage)

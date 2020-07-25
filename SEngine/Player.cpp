@@ -4,9 +4,13 @@
 #include "Raycast.h"
 #include <iostream>
 
-#define MOVE_SPEED 50
-#define JUMP_FORCE 600
 #define CAM_OFFSET glm::vec3(0,1,0)
+
+#define MOVE_SPEED 50
+#define JUMP_FORCE 1200
+
+#define MAX_STORED_VEL 2
+#define STORED_VEL_MULTIPLIER 50
 
 Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics)
 {
@@ -22,7 +26,7 @@ Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics
 
 	dGeomSetBody(m_geomID, m_bodyID);
 
-	dMassSetCapsule(&m_mass, .5, 2, .5, 2);
+	dMassSetCapsule(&m_mass, 1, 2, .5, 2);
 	dBodySetMass(m_bodyID, &m_mass);
 
 	dBodySetMaxAngularSpeed(m_bodyID, 0);
@@ -88,10 +92,38 @@ void Player::Jump()
 {
 	if (canJump)
 	{
-		std::cout << canJump << std::endl;
 		dBodySetLinearVel(m_bodyID, dBodyGetLinearVel(m_bodyID)[0], 0, dBodyGetLinearVel(m_bodyID)[2]);
 		dBodyAddForce(m_bodyID, 0, JUMP_FORCE, 0);
 		canJump = false;
 	}
 }
 
+void Player::StoreVel(float amount)
+{
+	storedVel += (fabs(dBodyGetLinearVel(m_bodyID)[0]) + fabs(dBodyGetLinearVel(m_bodyID)[2])) * amount;
+	dBodyAddForce(m_bodyID, dBodyGetLinearVel(m_bodyID)[0] * amount * -2000, 0, dBodyGetLinearVel(m_bodyID)[2] * amount * -2000);
+
+}
+
+void Player::ReleaseVel()
+{
+	glm::vec3 force(0,0,50);
+
+	if (storedVel > MAX_STORED_VEL)
+		storedVel = MAX_STORED_VEL;
+
+	force *= storedVel;
+
+
+
+	float xComp = (force.z * cosf(m_forward_angle) * STORED_VEL_MULTIPLIER);
+	//float yComp = (force.y * sinf(m_up_angle)) * STORED_VEL_MULTIPLIER;
+	float zComp = (force.z * sinf(m_forward_angle) * STORED_VEL_MULTIPLIER);
+
+	//dBodySetLinearVel(m_bodyID, xComp, dBodyGetLinearVel(m_bodyID)[1], zComp);
+	dBodyAddForce(m_bodyID, xComp, 0, zComp);
+
+	Move(force * storedVel);
+
+	storedVel = 0;
+}

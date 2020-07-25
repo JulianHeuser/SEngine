@@ -19,6 +19,8 @@ private:
 	enum
 	{
 		TRANSFORM_U,
+		COLOR1_U,
+		COLOR2_U,
 
 		NUM_UNIFORMS
 	};

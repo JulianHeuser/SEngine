@@ -20,8 +20,6 @@ Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 
 	//Physics
 	m_worldID = physics.GetWorld();
-	//m_bodyID = dBodyCreate(m_worldID);
-	//dBodySetKinematic(m_bodyID);
 
 	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
 
@@ -38,7 +36,6 @@ Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 
 	dGeomTriMeshDataBuildSimple(triMeshID, *triVert, model.positions.size(), indexes, model.indices.size());
 	m_geomID = dCreateTriMesh(physics.GetSpace(), triMeshID, NULL, NULL, NULL);
-	//dGeomSetBody(m_geomID, m_bodyID);
 }
 
 Mesh::Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indices, unsigned int numIndicies, Physics physics)
@@ -108,7 +105,6 @@ void Mesh::InitMesh(const IndexedModel& model)
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vertexArrayBuffers[INDEX_VB]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.indices.size() * sizeof(model.indices[0]), &model.indices[0], GL_STATIC_DRAW);

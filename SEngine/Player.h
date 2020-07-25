@@ -20,6 +20,8 @@ public:
 	void Update();
 
 	void Jump();
+	void StoreVel(float amount);
+	void ReleaseVel();
 
 	float m_forward_angle = 0;
 	float m_up_angle = 0;
@@ -42,5 +44,9 @@ private:
 
 	bool grounded = false;
 	bool canJump = false;
+
+
+	//variables for mechanics
+	float storedVel;
 };
 

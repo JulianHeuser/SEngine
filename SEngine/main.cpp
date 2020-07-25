@@ -130,8 +130,6 @@ int main()
 	double frameTime = 0;
 	double elapsedTime = 0;
 
-	//Initialize physics
-	dWorldSetGravity(physics.GetWorld(), 0, -5, 0);
 
 	Mesh meshList[] = {Mesh("./res/models/testLevel.obj", physics, glm::vec3(0,0,0))}; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
 	Scene testScene(meshList, 1);
@@ -139,6 +137,7 @@ int main()
 	Player player(glm::vec3(0, 50, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
 	glm::vec3 dir = glm::vec3(0, 0, 0);
 	bool holdingJump = false;
+	bool holdingMouse1 = false;
 
 	const float lookSensitivity = 5.0f;
 
@@ -189,7 +188,25 @@ int main()
 					break;
 				}
 				break;
-
+			case SDL_MOUSEBUTTONDOWN:
+				switch (e.button.button)
+				{
+				case SDL_BUTTON_LEFT:
+					holdingMouse1 = true;
+					break;
+				case SDL_BUTTON_RIGHT:
+					player.ReleaseVel();
+					break;
+				}
+				break;
+			case SDL_MOUSEBUTTONUP:
+				switch (e.button.button)
+				{
+				case SDL_BUTTON_LEFT:
+					holdingMouse1 = false;
+					break;
+				}
+				break;
 			case SDL_MOUSEMOTION:
 				player.m_forward_angle += e.motion.xrel * lookSensitivity * float(frameTime);
 				player.m_up_angle -= e.motion.yrel * lookSensitivity * float(frameTime);
@@ -225,9 +242,11 @@ int main()
 		player.Update();
 		if (holdingJump)
 			player.Jump();
+		if (holdingMouse1)
+			player.StoreVel(frameTime);
 
 		//Rendering
-		display.Clear(0.0f, 0.5f, 0.5f, 1.0f);
+		display.Clear(0.333f, 0.98823f, 0.95686f, 1.0f);
 
 		shader.Bind();
 		shader.Update(transform, player.m_cam);

@@ -16,4 +16,6 @@ Physics::Physics()
 	
 	dWorldSetContactMaxCorrectingVel(world, 0.9);
 	dWorldSetContactSurfaceLayer(world, 0.001);
+
+	dWorldSetGravity(world, 0, -8, 0);
 }
