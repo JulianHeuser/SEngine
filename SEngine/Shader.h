@@ -13,6 +13,7 @@ public:
 	void Bind();
 	void Update(const Transform& transform, const Camera& camera);
 
+	GLuint GetProgram() { return m_program; };
 private:
 	static const unsigned int NUM_SHADERS = 2;
 

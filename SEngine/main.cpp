@@ -123,15 +123,53 @@ int main()
 	Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, "Hello World");
 
 	Shader shader("./res/basicShader");
+	Shader quadShader("./res/renderQuad");
 	Transform transform;
 
+	
+	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+		// positions   // texCoords
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
 
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f
+	};
+	unsigned int quadVAO, quadVBO;
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	unsigned int framebuffer;
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); //Attach yourTexture so drawing goes into it
+	unsigned int rbo;
+	glGenFramebuffers(1, &rbo); //Create a frame buffer
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, DISPLAY_WIDTH, DISPLAY_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	double frameTime = 0;
 	double elapsedTime = 0;
 
 
-	Mesh meshList[] = {Mesh("./res/models/testLevel.obj", physics, glm::vec3(0,0,0))}; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
+	Mesh meshList[] = {Mesh("./res/models/testLevel.obj", physics, glm::vec3(0,0,0)) }; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
 	Scene testScene(meshList, 1);
 
 	Player player(glm::vec3(0, 50, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
@@ -246,15 +284,24 @@ int main()
 			player.StoreVel(frameTime);
 
 		//Rendering
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer); //Bind it so we draw to it
+		glEnable(GL_DEPTH_TEST);
 		display.Clear(0.333f, 0.98823f, 0.95686f, 1.0f);
-
+		
 		shader.Bind();
 		shader.Update(transform, player.m_cam);
-		//mesh.Draw();
 
-		//Render scene
+		//Render scene to texture
 		testScene.Draw();
 
+		//Render quad with the texture to apply post-processing
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST);
+		display.Clear(0.333f, 0.98823f, 0.95686f, 1.0f);
+		quadShader.Bind();
+		glBindVertexArray(quadVAO);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
 		display.Update();

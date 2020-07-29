@@ -7,6 +7,7 @@ Shader::Shader(const std::string& fileName)
     m_program = glCreateProgram();
     m_shaders[0] = CreateShader(LoadShader(fileName + ".vs"), GL_VERTEX_SHADER);
     m_shaders[1] = CreateShader(LoadShader(fileName + ".fs"), GL_FRAGMENT_SHADER);
+    //m_shaders[2] = CreateShader(LoadShader(fileName + ".gs"), GL_GEOMETRY_SHADER);
 
     for (unsigned int i = 0; i < NUM_SHADERS; i++)
     {
@@ -97,6 +98,9 @@ void Shader::Update(const Transform& transform, const Camera& camera)
     glUniformMatrix4fv(m_uniforms[TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
     glUniform3f(m_uniforms[COLOR1_U], 1,.8f,.243f);
     glUniform3f(m_uniforms[COLOR2_U], 1, .498f, .243f);
+
+
+
 }
 
 void Shader::CheckShaderError(GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage)

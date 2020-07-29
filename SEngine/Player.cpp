@@ -9,11 +9,13 @@
 #define MOVE_SPEED 50
 #define JUMP_FORCE 1200
 
-#define MAX_STORED_VEL 2
-#define STORED_VEL_MULTIPLIER 50
+#define MAX_STORED_VEL 5
+#define STORED_VEL_MULTIPLIER 1000
 
 Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics)
 {
+	storedVel = 0;
+
 	m_pos = spawnPos;
 	m_vel = glm::vec3(0, 0, 0);
 	m_cam = Camera(spawnPos, fov, aspectRatio, 0.1f, 2000.0f);
@@ -102,28 +104,22 @@ void Player::StoreVel(float amount)
 {
 	storedVel += (fabs(dBodyGetLinearVel(m_bodyID)[0]) + fabs(dBodyGetLinearVel(m_bodyID)[2])) * amount;
 	dBodyAddForce(m_bodyID, dBodyGetLinearVel(m_bodyID)[0] * amount * -2000, 0, dBodyGetLinearVel(m_bodyID)[2] * amount * -2000);
-
+	std::cout << storedVel << std::endl;
 }
 
 void Player::ReleaseVel()
 {
-	glm::vec3 force(0,0,50);
-
 	if (storedVel > MAX_STORED_VEL)
 		storedVel = MAX_STORED_VEL;
 
-	force *= storedVel;
-
-
-
-	float xComp = (force.z * cosf(m_forward_angle) * STORED_VEL_MULTIPLIER);
-	//float yComp = (force.y * sinf(m_up_angle)) * STORED_VEL_MULTIPLIER;
-	float zComp = (force.z * sinf(m_forward_angle) * STORED_VEL_MULTIPLIER);
+	float xComp = storedVel * (cosf(m_forward_angle) * STORED_VEL_MULTIPLIER);
+	float yComp = storedVel * (sinf(m_up_angle)) * STORED_VEL_MULTIPLIER;
+	float zComp = storedVel * (sinf(m_forward_angle) * STORED_VEL_MULTIPLIER);
 
 	//dBodySetLinearVel(m_bodyID, xComp, dBodyGetLinearVel(m_bodyID)[1], zComp);
-	dBodyAddForce(m_bodyID, xComp, 0, zComp);
+	dBodyAddForce(m_bodyID, xComp, yComp, zComp);
 
-	Move(force * storedVel);
+	//Move(force * storedVel);
 
 	storedVel = 0;
 }

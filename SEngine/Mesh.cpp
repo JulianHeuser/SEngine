@@ -23,6 +23,9 @@ Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 
 	dTriMeshDataID triMeshID = dGeomTriMeshDataCreate();
 
+	triVert = new dVector3[model.positions.size()];
+	indexes = new dTriIndex[model.indices.size()];
+
 	for (unsigned int i = 0; i < model.positions.size(); i++)
 	{
 		triVert[i][0] = model.positions[i].x;
@@ -36,6 +39,7 @@ Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 
 	dGeomTriMeshDataBuildSimple(triMeshID, *triVert, model.positions.size(), indexes, model.indices.size());
 	m_geomID = dCreateTriMesh(physics.GetSpace(), triMeshID, NULL, NULL, NULL);
+
 }
 
 Mesh::Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indices, unsigned int numIndicies, Physics physics)

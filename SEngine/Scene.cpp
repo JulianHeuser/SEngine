@@ -18,6 +18,7 @@ Scene::Scene(Mesh sceneMeshes[], unsigned int size)
 
 void Scene::Draw()
 {
+
 	for (unsigned int i = 0; i < m_meshNum; i++)
 	{
 		m_meshes[i].Draw();
