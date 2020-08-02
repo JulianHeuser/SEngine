@@ -1,10 +1,4 @@
 #version 150
-varying vec3 normal0;
-varying vec3 position0;
-varying vec2 texCoord0;
-varying vec3 lightDir0;
-
-uniform sampler2D screenTexture;
 
 out vec4 diffuseColor;
 

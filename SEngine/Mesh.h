@@ -30,8 +30,8 @@ class Mesh
 {
 public:
 	Mesh() {};
-	Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indicies, unsigned int numIndicies, Physics physics);
 	Mesh(const std::string fileName, Physics physics, glm::vec3 pos = glm::vec3(0, 0, 0));
+	Mesh(const std::string fileName, glm::vec3 pos = glm::vec3(0, 0, 0));
 	virtual ~Mesh();
 
 	void Draw();

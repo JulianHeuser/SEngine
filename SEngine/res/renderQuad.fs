@@ -4,6 +4,7 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
+uniform sampler2D edgeTexture;
 
 mat3 sx = mat3( 
     1.0, 2.0, 1.0, 
@@ -23,8 +24,8 @@ void main()
     mat3 I;
     for (int i=0; i<3; i++) {
         for (int j=0; j<3; j++) {
-            vec3 sample  = texelFetch(screenTexture, ivec2(gl_FragCoord) + ivec2(i-1,j-1), 0 ).rgb;
-            I[i][j] = length(sample); 
+            //vec3 sample  = texelFetch(edgeTexture, ivec2(gl_FragCoord) + ivec2(i-1,j-1), 0 ).rgb;
+            I[i][j] = texelFetch(edgeTexture, ivec2(gl_FragCoord) + ivec2(i-1,j-1), 0 ).r; //length(sample); 
 		}
 	}
 	

@@ -14,6 +14,7 @@
 #include "Physics.h"
 
 #define MAX_CONTACTS 50
+#define PHYSICS_TIMESTEP .016f
 
 Physics physics;
 
@@ -124,6 +125,7 @@ int main()
 
 	Shader shader("./res/basicShader");
 	Shader quadShader("./res/renderQuad");
+	Shader edgeShader("./res/edgeBase");
 	Transform transform;
 
 	
@@ -150,42 +152,64 @@ int main()
 
 	glBindVertexArray(0);
 
+	//Main render texture
 	unsigned int framebuffer;
 	glGenFramebuffers(1, &framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	unsigned int mainTexture;
+	glGenTextures(1, &mainTexture);
+	glBindTexture(GL_TEXTURE_2D, mainTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); //Attach yourTexture so drawing goes into it
-	
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mainTexture, 0); //Attach yourTexture so drawing goes into it
+
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo); //Create a frame buffer
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, DISPLAY_WIDTH, DISPLAY_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, DISPLAY_WIDTH, DISPLAY_HEIGHT); 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
 
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+	//Edge render texture
+	unsigned int framebuffer2;
+	glGenFramebuffers(1, &framebuffer2);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer2);
+
+	unsigned int edgeTexture;
+	glGenTextures(1, &edgeTexture);
+	glBindTexture(GL_TEXTURE_2D, edgeTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, edgeTexture, 0); //Attach yourTexture so drawing goes into it
+
+	unsigned int rbo2;
+	glGenRenderbuffers(1, &rbo2); //Create a frame buffer
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo2);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, DISPLAY_WIDTH, DISPLAY_HEIGHT); 
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo2); // now actually attach it
+
+
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	double frameTime = 0;
 	double elapsedTime = 0;
 
-
-	Mesh meshList[] = {Mesh("./res/models/testLevel.obj", physics, glm::vec3(0,0,0)) }; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
-	Scene testScene(meshList, 1);
+	Mesh meshList[] = {Mesh("./res/models/testLevel.obj", physics, glm::vec3(0,0,0)), Mesh("./res/models/building.obj", glm::vec3(-400,0,0)) }; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
+	Scene testScene(meshList, 2);
 
 	Player player(glm::vec3(0, 50, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
 	glm::vec3 dir = glm::vec3(0, 0, 0);
 	bool holdingJump = false;
 	bool holdingMouse1 = false;
 
-	const float lookSensitivity = 5.0f;
+	const float lookSensitivity = .005f;
 
 
 	while (!display.IsClosed())
@@ -193,15 +217,6 @@ int main()
 		//Start timing the frame
 		auto frameTimeStart = std::chrono::high_resolution_clock::now();
 
-		//Physics step
-		elapsedTime += frameTime;
-		if (elapsedTime > .01)
-		{
-			dSpaceCollide(physics.GetSpace(), 0, &nearCallback);
-			dWorldQuickStep(physics.GetWorld(), .01);
-			dJointGroupEmpty(physics.GetContacts());
-			elapsedTime = 0;
-		}
 
 
 		//Input
@@ -254,8 +269,8 @@ int main()
 				}
 				break;
 			case SDL_MOUSEMOTION:
-				player.m_forward_angle += e.motion.xrel * lookSensitivity * float(frameTime);
-				player.m_up_angle -= e.motion.yrel * lookSensitivity * float(frameTime);
+				player.m_forward_angle += e.motion.xrel * lookSensitivity;
+				player.m_up_angle -= e.motion.yrel * lookSensitivity;
 				break;
 			case SDL_KEYUP:
 				switch (e.key.keysym.sym)
@@ -282,10 +297,23 @@ int main()
 
 			}
 		}
+
+		//Fixed timestep (For physics and stuff)
+		elapsedTime += frameTime;
+		if (elapsedTime > PHYSICS_TIMESTEP)
+		{
+			elapsedTime = 0;
+
+			//Physics Step
+			dSpaceCollide(physics.GetSpace(), 0, &nearCallback);
+			dWorldQuickStep(physics.GetWorld(), PHYSICS_TIMESTEP);
+			dJointGroupEmpty(physics.GetContacts());
+
+			//Player movement
+			player.Move(dir * (.5f));
+			player.Update();
+		}
 		
-		//Player code
-		player.Move(dir * (float(frameTime) * 50.0f));
-		player.Update();
 		if (holdingJump)
 			player.Jump();
 		if (holdingMouse1)
@@ -299,16 +327,35 @@ int main()
 		shader.Bind();
 		shader.Update(transform, player.m_cam);
 
-		//Render scene to texture
+		//Render scene to main texture
 		testScene.Draw();
 
-		//Render quad with the texture to apply post-processing
+
+		//Render scene to edge texture
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer2);
+		display.Clear(0.333f, 0.98823f, 0.95686f, 1.0f);
+		edgeShader.Bind();
+		edgeShader.Update(transform, player.m_cam);
+		testScene.Draw();
+		
+
+		//Clear stuff + disable depth test temporarily
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDisable(GL_DEPTH_TEST);
 		display.Clear(0.333f, 0.98823f, 0.95686f, 1.0f);
+
+		//Render quad with the texture to apply post-processing
 		quadShader.Bind();
 		glBindVertexArray(quadVAO);
-		glBindTexture(GL_TEXTURE_2D, texture);
+
+		GLuint t1Location = glGetUniformLocation(quadShader.GetProgram(), "screenTexture");
+		GLuint t2Location = glGetUniformLocation(quadShader.GetProgram(), "edgeTexture");
+		glUniform1i(t1Location, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, mainTexture);
+		glUniform1i(t2Location, 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, edgeTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 

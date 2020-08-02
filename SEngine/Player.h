@@ -40,13 +40,14 @@ private:
 	dMass m_mass;
 
 	glm::vec3 m_pos;
-	glm::vec3 m_vel;
+
 
 	bool grounded = false;
 	bool canJump = false;
 
 
 	//variables for mechanics
+	float vel;
 	float storedVel;
 };
 

@@ -6,6 +6,7 @@
 
 #define CAM_OFFSET glm::vec3(0,1,0)
 
+#define MAX_SPEED 50
 #define MOVE_SPEED 50
 #define JUMP_FORCE 1200
 
@@ -17,7 +18,7 @@ Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics
 	storedVel = 0;
 
 	m_pos = spawnPos;
-	m_vel = glm::vec3(0, 0, 0);
+	vel = 0;
 	m_cam = Camera(spawnPos, fov, aspectRatio, 0.1f, 2000.0f);
 
 	//Physics
@@ -45,11 +46,30 @@ Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics
 void Player::Move(glm::vec3 moveAmount)
 {
 
-	float xComp = (moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle)) * MOVE_SPEED;
-	float zComp = (moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle)) * MOVE_SPEED;
 
-	//dBodySetLinearVel(m_bodyID, xComp, dBodyGetLinearVel(m_bodyID)[1], zComp);
-	dBodyAddForce(m_bodyID, xComp, 0, zComp);
+	float xComp = (moveAmount.z * cosf(m_forward_angle) - moveAmount.x * sinf(m_forward_angle));// * MOVE_SPEED;
+	float zComp = (moveAmount.z * sinf(m_forward_angle) + moveAmount.x * cosf(m_forward_angle));// * MOVE_SPEED;
+
+
+	float totalVel = fabs(dBodyGetLinearVel(m_bodyID)[0]) + fabs(dBodyGetLinearVel(m_bodyID)[2]);
+	if (totalVel == 0)
+		totalVel = 1;
+	dVector3 normalizedVel = { dBodyGetLinearVel(m_bodyID)[0] / totalVel, 0, dBodyGetLinearVel(m_bodyID)[2] / totalVel }; //Acts as the forward vector of velocity
+	dVector3 moveVector = { xComp, 0 , zComp };
+	dReal dot = dCalcVectorDot3(normalizedVel, moveVector);
+	dReal inverseDot = ((dot < 0 ? 1 : 1 - dot) * 5 + 1 );
+
+	//Subtract a force in the direction of our current velocity
+	//dBodyAddForce(m_bodyID, -normalizedVel[0] * inverseDot * (totalVel/2), 0, -normalizedVel[2] * inverseDot * (totalVel/2));
+
+	//Add a force in the direction we're looking
+	dBodyAddForce(m_bodyID, xComp * MOVE_SPEED * (inverseDot + 1), 0, zComp * MOVE_SPEED * (inverseDot + 1));
+
+	if (totalVel > MAX_SPEED)
+	{
+		dVector3 maxVel = { normalizedVel[0] * float(MAX_SPEED), 0 , normalizedVel[2] * float(MAX_SPEED) };
+		dBodySetLinearVel(m_bodyID, maxVel[0], dBodyGetLinearVel(m_bodyID)[1], maxVel[2]);
+	}
 
 	UpdatePos();
 }
@@ -104,7 +124,6 @@ void Player::StoreVel(float amount)
 {
 	storedVel += (fabs(dBodyGetLinearVel(m_bodyID)[0]) + fabs(dBodyGetLinearVel(m_bodyID)[2])) * amount;
 	dBodyAddForce(m_bodyID, dBodyGetLinearVel(m_bodyID)[0] * amount * -2000, 0, dBodyGetLinearVel(m_bodyID)[2] * amount * -2000);
-	std::cout << storedVel << std::endl;
 }
 
 void Player::ReleaseVel()

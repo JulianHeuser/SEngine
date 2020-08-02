@@ -42,41 +42,23 @@ Mesh::Mesh(const std::string fileName, Physics physics, glm::vec3 pos)
 
 }
 
-Mesh::Mesh(Vertex* verticies, unsigned int numVerticies, unsigned int* indices, unsigned int numIndicies, Physics physics)
+
+Mesh::Mesh(const std::string fileName, glm::vec3 pos)
 {
+	IndexedModel model = OBJModel(fileName).ToIndexedModel();
 
-	IndexedModel model;
+	m_pos = pos;
 
-	for (unsigned int i = 0; i < numVerticies; i++)
+	for (unsigned int i = 0; i < model.positions.size(); i++)
 	{
-		model.positions.push_back(*verticies[i].GetPos());
-		model.texCoords.push_back(*verticies[i].GetTexCoord());
-		model.normals.push_back(*verticies[i].GetNormal());
-	}
-
-	for (unsigned int i = 0; i < numIndicies; i++)
-	{
-		model.indices.push_back(indices[i]);
+		model.positions[i].x += pos.x;
+		model.positions[i].y += pos.y;
+		model.positions[i].z += pos.z;
 	}
 
 	InitMesh(model);
 
-	/*
-	std::vector<glm::vec3> positions;
-	std::vector<glm::vec2> texCoords;
-
-	positions.reserve(numVerticies);
-	texCoords.reserve(numVerticies);
-
-	for (unsigned int i = 0; i < numVerticies; i++)
-	{
-		positions.push_back(*verticies[i].GetPos());
-		texCoords.push_back(*verticies[i].GetTexCoord());
-	}
-	*/
-
 }
-
 
 Mesh::~Mesh()
 {
