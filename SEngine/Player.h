@@ -31,6 +31,7 @@ private:
 	void UpdateRot();
 	void UpdatePos();
 	void CheckGround();
+	void AutoStep();
 
 	//CommonRigidBodyBase* m_rigidBody;
 	dWorldID m_worldID;

@@ -7,11 +7,10 @@
 #include "Camera.h"
 #include "Player.h"
 #include "Scene.h"
+#include "Physics.h"
 #include <GL/glew.h>
 #include <chrono>
-#include <random>
 #include <memory>
-#include "Physics.h"
 
 #define MAX_CONTACTS 50
 #define PHYSICS_TIMESTEP .016f
@@ -201,10 +200,10 @@ int main()
 	double frameTime = 0;
 	double elapsedTime = 0;
 
-	Mesh meshList[] = {Mesh("./res/models/testLevel.obj", physics, glm::vec3(0,0,0)), Mesh("./res/models/building.obj", glm::vec3(-400,0,0)) }; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
+	Mesh meshList[] = {Mesh("./res/models/level1.obj", physics, glm::vec3(0,0,0)), Mesh("./res/models/building.obj", glm::vec3(-400,0,0)) }; //Mesh("./res/models/flat_floor.obj", physics, glm::vec3(50,1,0)) 
 	Scene testScene(meshList, 2);
 
-	Player player(glm::vec3(0, 50, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
+	Player player(glm::vec3(0, 4, 0), 70.0f, (float)display.GetWidth() / (float)display.GetHeight(), physics);
 	glm::vec3 dir = glm::vec3(0, 0, 0);
 	bool holdingJump = false;
 	bool holdingMouse1 = false;

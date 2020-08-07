@@ -6,9 +6,9 @@
 
 #define CAM_OFFSET glm::vec3(0,1,0)
 
-#define MAX_SPEED 50
+#define MAX_SPEED 75
 #define MOVE_SPEED 50
-#define JUMP_FORCE 1200
+#define JUMP_FORCE 5000
 
 #define MAX_STORED_VEL 5
 #define STORED_VEL_MULTIPLIER 1000
@@ -78,6 +78,7 @@ void Player::Update()
 {
 	UpdateRot();
 	CheckGround();
+	AutoStep();
 }
 
 void Player::UpdatePos()
@@ -93,12 +94,15 @@ void Player::UpdateRot()
 
 void Player::CheckGround()
 {
-	dVector3 startPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1] - 1.2f,dBodyGetPosition(m_bodyID)[2] };
+	dVector3 startPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1],dBodyGetPosition(m_bodyID)[2] };
 	dVector3 endPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1] - 1.5f,dBodyGetPosition(m_bodyID)[2] };
 
-	bool oldGrounded = grounded;
+	dVector3 boxPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1] - 1.2f,dBodyGetPosition(m_bodyID)[2] };
 
-	grounded = RaycastQuery(m_spaceID, startPos, endPos);
+	bool oldGrounded = grounded;
+	dGeomDisable(m_geomID);
+	grounded = (BoxCheck(m_spaceID, boxPos, .8f));
+	dGeomEnable(m_geomID);
 
 	if (!grounded)
 		canJump = false;
@@ -106,7 +110,14 @@ void Player::CheckGround()
 	{
 		canJump = true;
 	}
+	std::cout << grounded << std::endl;
+}
 
+//Automatically "snap" the player to the ground if there's a small change in elevation
+void Player::AutoStep()
+{
+	//TODO: do this using raycasts or some shit
+	//grounded = (RaycastQuery(m_spaceID, startPos, endPos));
 }
 
 //Player actions

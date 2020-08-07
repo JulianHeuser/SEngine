@@ -19,5 +19,5 @@ in VertexData {
 
 void main()
 {
-	diffuseColor = vec4((dot(vec3(.5,.5,0), gs_in.normal) + 1)/2,0,0,1);//vec4((gs_in.normal.x+1)/2,(gs_in.normal.y+1),(gs_in.normal.z+1)/2,1);
+	diffuseColor = vec4((dot(vec3(.5,.5,0), gs_in.normal) + 1)/2,(dot(vec3(0,-.5,.5), gs_in.normal) + 1)/2,0,1);//vec4((gs_in.normal.x+1)/2,(gs_in.normal.y+1),(gs_in.normal.z+1)/2,1);
 }
