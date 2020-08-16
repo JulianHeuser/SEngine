@@ -52,14 +52,10 @@ static void nearCallback(void* data, dGeomID o1, dGeomID o2)
 
 	{
 
-		contact[i].surface.mode = dContactBounce | dContactSlip1;
+		contact[i].surface.mode = dContactSlip1;
 		
 		contact[i].surface.mu = 5;
 
-
-		contact[i].surface.bounce = 0.01;
-
-		contact[i].surface.bounce_vel = 0.1;
 
 		contact[i].surface.slip1 = .1;
 
@@ -255,7 +251,6 @@ int main()
 					holdingMouse1 = true;
 					break;
 				case SDL_BUTTON_RIGHT:
-					player.ReleaseVel();
 					break;
 				}
 				break;
@@ -263,6 +258,7 @@ int main()
 				switch (e.button.button)
 				{
 				case SDL_BUTTON_LEFT:
+					player.ReleaseVel();
 					holdingMouse1 = false;
 					break;
 				}

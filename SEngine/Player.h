@@ -46,6 +46,7 @@ private:
 	bool grounded = false;
 	bool canJump = false;
 
+	float floorDist;
 
 	//variables for mechanics
 	float vel;

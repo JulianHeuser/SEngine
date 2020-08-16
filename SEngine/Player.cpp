@@ -6,12 +6,12 @@
 
 #define CAM_OFFSET glm::vec3(0,1,0)
 
-#define MAX_SPEED 75
+#define MAX_SPEED 100//75
 #define MOVE_SPEED 50
 #define JUMP_FORCE 5000
 
 #define MAX_STORED_VEL 5
-#define STORED_VEL_MULTIPLIER 1000
+#define STORED_VEL_MULTIPLIER .95 //Storing all velocity can lead to gaining infinite speed
 
 Player::Player(glm::vec3 spawnPos, float fov, float aspectRatio, Physics physics)
 {
@@ -77,8 +77,10 @@ void Player::Move(glm::vec3 moveAmount)
 void Player::Update()
 {
 	UpdateRot();
+	dGeomDisable(m_geomID);
 	CheckGround();
 	AutoStep();
+	dGeomEnable(m_geomID);
 }
 
 void Player::UpdatePos()
@@ -94,30 +96,51 @@ void Player::UpdateRot()
 
 void Player::CheckGround()
 {
-	dVector3 startPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1],dBodyGetPosition(m_bodyID)[2] };
-	dVector3 endPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1] - 1.5f,dBodyGetPosition(m_bodyID)[2] };
-
 	dVector3 boxPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1] - 1.2f,dBodyGetPosition(m_bodyID)[2] };
 
 	bool oldGrounded = grounded;
-	dGeomDisable(m_geomID);
 	grounded = (BoxCheck(m_spaceID, boxPos, .8f));
-	dGeomEnable(m_geomID);
 
 	if (!grounded)
+	{
 		canJump = false;
+	}
 	else if (!oldGrounded && grounded)
 	{
 		canJump = true;
 	}
-	std::cout << grounded << std::endl;
+
+
+	if (grounded)
+	{
+		dBodyAddForce(m_bodyID, 0, -25, 0);
+	}
 }
 
+#define SNAP_THRESHOLD .5f
+#define SNAP_THRESHOLD_2 3.0f
 //Automatically "snap" the player to the ground if there's a small change in elevation
 void Player::AutoStep()
 {
-	//TODO: do this using raycasts or some shit
-	//grounded = (RaycastQuery(m_spaceID, startPos, endPos));
+	dVector3 startPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1],dBodyGetPosition(m_bodyID)[2] };
+	dVector3 endPos = { dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1] - 50.0f,dBodyGetPosition(m_bodyID)[2] };
+	dVector3 dif;
+
+	float lastFloorDist = floorDist;
+	RaycastQuery(m_spaceID, startPos, endPos);
+	floorDist = endPos[1];
+
+	float floorDistDiff = lastFloorDist - floorDist;
+
+	if (floorDistDiff < SNAP_THRESHOLD && floorDistDiff > .05f && fabs(startPos[1] - endPos[1]) < SNAP_THRESHOLD_2)
+	{
+		//dBodySetPosition(m_bodyID, dBodyGetPosition(m_bodyID)[0], dBodyGetPosition(m_bodyID)[1] + floorDistDiff, dBodyGetPosition(m_bodyID)[2]);
+
+		dBodyAddForce(m_bodyID, 0, -50, 0);
+
+		std::cout << floorDistDiff << std::endl;
+	}
+
 }
 
 //Player actions
@@ -133,21 +156,25 @@ void Player::Jump()
 
 void Player::StoreVel(float amount)
 {
-	storedVel += (fabs(dBodyGetLinearVel(m_bodyID)[0]) + fabs(dBodyGetLinearVel(m_bodyID)[2])) * amount;
-	dBodyAddForce(m_bodyID, dBodyGetLinearVel(m_bodyID)[0] * amount * -2000, 0, dBodyGetLinearVel(m_bodyID)[2] * amount * -2000);
+	if (storedVel == 0)
+	{
+		storedVel = (fabs(dBodyGetLinearVel(m_bodyID)[0]) + fabs(dBodyGetLinearVel(m_bodyID)[2]));
+	}
+	dBodyAddForce(m_bodyID, dBodyGetLinearVel(m_bodyID)[0] * amount * -2000, dBodyGetLinearVel(m_bodyID)[1] * amount * -2000, dBodyGetLinearVel(m_bodyID)[2] * amount * -2000);
 }
 
 void Player::ReleaseVel()
 {
-	if (storedVel > MAX_STORED_VEL)
-		storedVel = MAX_STORED_VEL;
+	//if (storedVel > MAX_STORED_VEL)
+	//	storedVel = MAX_STORED_VEL;
+	storedVel *= STORED_VEL_MULTIPLIER;
 
-	float xComp = storedVel * (cosf(m_forward_angle) * STORED_VEL_MULTIPLIER);
-	float yComp = storedVel * (sinf(m_up_angle)) * STORED_VEL_MULTIPLIER;
-	float zComp = storedVel * (sinf(m_forward_angle) * STORED_VEL_MULTIPLIER);
+	float xComp = storedVel * (cosf(m_forward_angle));
+	float yComp = storedVel * (sinf(m_up_angle));
+	float zComp = storedVel * (sinf(m_forward_angle));
 
-	//dBodySetLinearVel(m_bodyID, xComp, dBodyGetLinearVel(m_bodyID)[1], zComp);
-	dBodyAddForce(m_bodyID, xComp, yComp, zComp);
+	dBodySetLinearVel(m_bodyID, xComp, yComp, zComp);
+	//dBodyAddForce(m_bodyID, xComp, yComp, zComp);
 
 	//Move(force * storedVel);
 
